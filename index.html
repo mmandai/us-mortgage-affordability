@@ -118,6 +118,9 @@ input[type=number]:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 
 /* ── Primary PITI display ── */
 .piti-display{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border-radius:var(--r2);padding:22px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden;}
 .piti-display::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(37,99,235,.3) 0%,transparent 60%);pointer-events:none;}
+.piti-display.good{background:linear-gradient(135deg,#064e3b 0%,#065f46 100%);}
+.piti-display.warn{background:linear-gradient(135deg,#78350f 0%,#92400e 100%);}
+.piti-display.bad{background:linear-gradient(135deg,#7f1d1d 0%,#991b1b 100%);}
 .piti-label{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px;}
 .piti-amount{font-family:var(--mono);font-size:44px;font-weight:500;line-height:1;color:var(--white);}
 .piti-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;font-weight:500;}
@@ -220,7 +223,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);padding:40px 0;text-ali
 
 <header class="site-header">
   <div class="hd-inner">
-    <a href="https://mmandai.github.io/mortgage-affordability/" class="logo">MM<em>DAI</em></a>
+    <a href="https://mmandai.github.io/us-mortgage-affordability/" class="logo">MM<em>DAI</em></a>
     <nav class="hd-nav">
       <a href="#calculator">Calculator</a>
       <a href="#explainer">How it works</a>
@@ -362,10 +365,10 @@ footer{background:var(--navy);color:rgba(255,255,255,.5);padding:40px 0;text-ali
             <span class="panel-dot"></span>
             <h2>Affordability Results</h2>
           </div>
-          <div class="panel-body">
+          <div class="panel-body"> 
 
             <!-- PITI primary -->
-            <div class="piti-display">
+            <div class="piti-display" id="pitiDisplay">
               <div class="piti-label">Total Monthly PITI</div>
               <div class="piti-amount" id="pitiAmount">—</div>
               <div class="piti-sub" id="pitiSub">—</div>
@@ -637,7 +640,12 @@ function calc(){
   // PITI display
   el('pitiAmount').textContent=fmtUSD(piti);
   el('pitiSub').textContent=`${fmtUSD(monthlyPI)} P&I · ${fmtUSD(monthlyTax)} tax · ${fmtUSD(monthlyIns)} ins${pmi>0?' · '+fmtUSD(pmi)+' PMI/MIP':''}`;
-
+  const pd = el('pitiDisplay');
+  pd.classList.remove('good','warn','bad');
+  if(backDTI <= 0.36)       pd.classList.add('good');
+  else if(backDTI <= 0.43)  pd.classList.add('warn');
+  else                       pd.classList.add('bad');
+  
   // Verdict
   const vEl=el('verdict');
   vEl.className='verdict';
